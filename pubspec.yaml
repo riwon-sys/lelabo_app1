@@ -29,8 +29,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
-    sdk: flutter
-
+    sdk: flutter  # 플로터 SDK 라이브러리 추가
+  dio: ^5.8.0+1 # 비동기 통신 라이브러리 추가
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
