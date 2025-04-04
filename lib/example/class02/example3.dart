@@ -66,11 +66,42 @@ void main(){
     }
     print(i+1); // 홀수에 +1해서 짝수만 출력
   }
-  // 5. 기본 함수
+  /*
+  * // 5. 기본 함수
   // 5-(1). 기본함수문
   //int add(int a, int b){
   //  return a+b;
   //}
   //int number=add(1,2);
   // print(number);
+  * // 5-(2)
+  int add(int a , int b);
+  return a+b
+
+   */
+  // 6. 패턴 매칭 switch문
+  switch (number){
+    case 1:
+      print('one');
+
+  }
+  var obj = ['a', 'b'];
+  switch (obj) {
+    case [var a, var b]:
+      print('$a,$b'); // a,b
+  }
+
+  switch (obj) {
+    // Matches if 1 ==obj.
+    case 1:
+      print('one');
+      // Matches if the value of obj is between the constant values of 'first' and 'last'.
+  }
+/*
+  case >=first&& <=last:
+    print('in range');
+    case(var a, var bool);
+    print ('a=$a, b= $b');
+    default
+*/
 }
