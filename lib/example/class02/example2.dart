@@ -29,7 +29,7 @@ void main(){ // main 함수가 스레드를 갖고 시작하는 코드의 시작
    try {
    // 1. 보내려고 하는 내용물 JSON(Dart map)
    final sendData ={"cname": "자바의정석",
-     "ctae": "남궁민",
+     "ctec": "남궁민",
      "cdate": "2025-03-01~25-06-30"};
    // 2. dio객체를 이용한 자바와의 통신방법
    final a = 3+3;
