@@ -1,14 +1,9 @@
-/*  book_detail.dart | rw 25-04-18 재구성
-    - 특정 추천 도서의 상세 정보와 리뷰를 출력합니다.
-    - Dio로 /ab/abdetail + /rb/rbreviewlist?aid= 호출하여 도서 + 리뷰 출력
-    - 관련 리뷰는 별도 컴포넌트(review_card.dart)로 구성
-*/
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../review/review_card.dart';
 import '../review/review_form.dart';
-
+import '../book/book_form.dart'; // ✅ 도서 수정 화면 import 추가
+import '../book/book_delete.dart';
 class BookDetailPage extends StatefulWidget { // CS
   final int aid; // 도서 식별자
   const BookDetailPage({super.key, required this.aid});
@@ -25,12 +20,14 @@ class _BookDetailPageState extends State<BookDetailPage> { // CS
   // [1] 도서 + 리뷰 불러오기
   Future<void> fetchData() async {
     try {
-      final bRes = await dio.get("http://192.168.40.5:8080/ab/abdetail", queryParameters: {"aid": widget.aid});
-      final rRes = await dio.get("http://192.168.40.5:8080/rb/rbreviewlist", queryParameters: {"aid": widget.aid});
+      final response = await dio.get(
+        "http://192.168.40.5:8080/ab/abfindbyid",
+        queryParameters: {"aid": widget.aid},
+      );
 
       setState(() {
-        book = bRes.data;
-        reviews = List<Map<String, dynamic>>.from(rRes.data);
+        book = response.data;
+        reviews = List<Map<String, dynamic>>.from(response.data['reviewList'] ?? []);
       });
     } catch (e) {
       print("불러오기 실패: $e");
@@ -50,6 +47,7 @@ class _BookDetailPageState extends State<BookDetailPage> { // CS
         title: Text(book?['atitle'] ?? '도서 상세'),
         backgroundColor: Colors.green.shade800,
         actions: [
+          // ✅ 리뷰 작성 버튼
           IconButton(
             icon: Icon(Icons.rate_review),
             onPressed: () {
@@ -58,9 +56,41 @@ class _BookDetailPageState extends State<BookDetailPage> { // CS
                 MaterialPageRoute(
                   builder: (context) => ReviewFormPage(aid: widget.aid),
                 ),
-              );
+              ).then((value) {
+                if (value == true) fetchData(); // 등록 성공 시 새로고침
+              });
             },
-          )
+          ),
+
+          // ✅ 도서 수정 버튼 추가
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookFormPage(aid: widget.aid),
+                ),
+              ).then((value) {
+                if (value == true) fetchData(); // 수정 후 새로고침
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookDeletePage(aid: widget.aid),
+                ),
+              ).then((value) {
+                if (value == true) {
+                  Navigator.pop(context, true); // 목록으로 돌아가기 + 새로고침
+                }
+              });
+            },
+          ),
         ],
       ),
       body: book == null
@@ -71,7 +101,10 @@ class _BookDetailPageState extends State<BookDetailPage> { // CS
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if ((book!['aimg'] ?? '').isNotEmpty)
-              Image.network("http://localhost:8080/upload/${book!['aimg']}", height: 200),
+              Image.network(
+                "http://192.168.40.5:8080/upload/${book!['aimg']}",
+                height: 200,
+              ),
             SizedBox(height: 12),
             Text("제목: ${book!['atitle']}", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             Text("저자: ${book!['awriter']}"),
@@ -85,6 +118,9 @@ class _BookDetailPageState extends State<BookDetailPage> { // CS
               rwriter: r['rwriter'] ?? '',
               rcontent: r['rcontent'] ?? '',
               rimg: r['rimg'] ?? '',
+              rno: r['rno'],
+              aid: widget.aid,
+              onDeleted: fetchData, // 삭제 후 새로고침
             ))
           ],
         ),

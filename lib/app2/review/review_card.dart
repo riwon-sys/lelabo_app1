@@ -4,12 +4,16 @@
 */
 
 import 'package:flutter/material.dart';
+import 'review_delete.dart'; // 삭제 화면 import
 
 class ReviewCard extends StatelessWidget { // CS
-  final String rtitle;     // 리뷰 제목
-  final String rwriter;    // 리뷰 작성자
-  final String rcontent;   // 리뷰 내용
-  final String rimg;       // 리뷰 이미지 파일명
+  final String rtitle;
+  final String rwriter;
+  final String rcontent;
+  final String rimg;
+  final int rno;     // ✅ 리뷰 번호
+  final int aid;     // ✅ 책 번호
+  final VoidCallback? onDeleted; // ✅ 삭제 후 새로고침을 위한 콜백
 
   const ReviewCard({
     Key? key,
@@ -17,6 +21,9 @@ class ReviewCard extends StatelessWidget { // CS
     required this.rwriter,
     required this.rcontent,
     required this.rimg,
+    required this.rno,
+    required this.aid,
+    this.onDeleted,
   }) : super(key: key);
 
   @override
@@ -29,7 +36,28 @@ class ReviewCard extends StatelessWidget { // CS
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(rtitle, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            // 제목 + 삭제 버튼을 한 줄에 배치
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(rtitle, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                IconButton(
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReviewDeletePage(rno: rno, aid: aid),
+                      ),
+                    ).then((value) {
+                      if (value == true && onDeleted != null) {
+                        onDeleted!(); // ✅ 삭제 성공 시 콜백 호출
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
             Text("작성자: $rwriter", style: TextStyle(color: Colors.grey[600])),
             const SizedBox(height: 8),
             Text(rcontent),
@@ -45,5 +73,4 @@ class ReviewCard extends StatelessWidget { // CS
       ),
     );
   } // fe
-
 } // CE

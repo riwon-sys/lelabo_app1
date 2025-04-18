@@ -22,17 +22,19 @@ class _ReviewDeletePageState extends State<ReviewDeletePage> {
 
   Future<void> deleteReview() async {
     try {
-      final formData = FormData.fromMap({
-        "rno": widget.rno,
-        "rpwd": pwdCtrl.text
-      });
+      final response = await dio.delete(
+        "http://192.168.40.5:8080/rb/rbdelete",
+        queryParameters: {
+          "rno": widget.rno,
+          "rpwd": pwdCtrl.text,
+        },
+      );
 
-      final response = await dio.post("http://192.168.40.5:8080/rb/rbdelete", data: formData);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data == true) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("리뷰가 삭제되었습니다.")),
         );
-        Navigator.pop(context); // 삭제 후 이전 페이지로 복귀
+        Navigator.pop(context, true);
       }
     } catch (e) {
       print("삭제 실패: $e");

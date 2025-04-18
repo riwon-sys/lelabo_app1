@@ -44,6 +44,10 @@ class _BookListPageState extends State<BookListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("도서 목록"),
+        backgroundColor: Colors.green.shade800,
+      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : books.isEmpty
@@ -70,14 +74,19 @@ class _BookListPageState extends State<BookListPage> {
                   children: [
                     if ((book['aimg'] ?? '').isNotEmpty)
                       Image.network(
-                        "http://localhost:8080/upload/${book['aimg']}",
+                        "http://192.168.40.5:8080/upload/${book['aimg']}",
+                        // ✅ 로컬호스트 수정
                         height: 160,
                       ),
                     SizedBox(height: 8),
-                    Text("제목: ${book['atitle']}", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text("저자: ${book['awriter']}", style: TextStyle(color: Colors.grey[600])),
+                    Text("제목: ${book['atitle']}", style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                        "저자: ${book['awriter']}", style: TextStyle(color: Colors
+                        .grey[600])),
                     SizedBox(height: 4),
-                    Text("소개: ${book['acontent']}", maxLines: 2, overflow: TextOverflow.ellipsis),
+                    Text("소개: ${book['acontent']}", maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
@@ -85,6 +94,18 @@ class _BookListPageState extends State<BookListPage> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/bookForm') // 📌 라우트 방식 사용 시
+              .then((value) {
+            if (value == true) fetchBooks(); // ✅ 등록/삭제 후 목록 새로고침
+          });
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.green,
+        tooltip: "도서 등록하기",
+      ),
     );
   }
 }
+

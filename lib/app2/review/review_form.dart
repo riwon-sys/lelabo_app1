@@ -48,7 +48,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
         "rpwd": pwdCtrl.text,
         "aid": widget.aid,
         if (imageFile != null)
-          "file": await MultipartFile.fromFile(imageFile!.path),
+          "multipartFile": await MultipartFile.fromFile(imageFile!.path), // ✅ 키 이름 수정
       });
 
       final dio = Dio();
@@ -56,7 +56,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("리뷰가 등록되었습니다.")));
-        Navigator.pop(context);
+        Navigator.pop(context, true); // 등록 성공 시 true 반환
       } else {
         throw Exception("등록 실패");
       }
