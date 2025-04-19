@@ -1,130 +1,142 @@
+/*  book_detail.dart | rw 25-04-19 수정
+    - 선택한 도서 상세 정보 출력
+    - 리뷰 목록 표시 및 리뷰 등록, 책 수정/삭제 버튼 포함
+*/
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import '../review/review_card.dart';
-import '../review/review_form.dart';
-import '../book/book_form.dart'; // ✅ 도서 수정 화면 import 추가
-import '../book/book_delete.dart';
-class BookDetailPage extends StatefulWidget { // CS
-  final int aid; // 도서 식별자
-  const BookDetailPage({super.key, required this.aid});
+import 'package:lelabo_app1/app2/review/review_card.dart';
+import 'package:lelabo_app1/app2/review/review_form.dart';
+import 'package:lelabo_app1/app2/book/book_form.dart';
+import 'package:lelabo_app1/app2/book/book_delete.dart';
+
+class BookDetailPage extends StatefulWidget {
+  final int aid;
+  const BookDetailPage({Key? key, required this.aid}) : super(key: key);
 
   @override
   State<BookDetailPage> createState() => _BookDetailPageState();
-} // CE
+}
 
-class _BookDetailPageState extends State<BookDetailPage> { // CS
-  Dio dio = Dio();
-  Map<String, dynamic>? book; // 도서 상세 정보
-  List<Map<String, dynamic>> reviews = []; // 연결된 리뷰 리스트
+class _BookDetailPageState extends State<BookDetailPage> {
+  final Dio dio = Dio();
+  Map<String, dynamic>? book;
+  List<Map<String, dynamic>> reviews = [];
+  bool isLoading = true;
 
-  // [1] 도서 + 리뷰 불러오기
-  Future<void> fetchData() async {
+  @override
+  void initState() {
+    super.initState();
+    fetchDetail();
+  }
+
+  Future<void> fetchDetail() async {
     try {
       final response = await dio.get(
         "http://192.168.40.5:8080/ab/abfindbyid",
         queryParameters: {"aid": widget.aid},
       );
-
+      final reviewRes = await dio.get(
+        "http://192.168.40.5:8080/rb/rbfindbyaid",
+        queryParameters: {"aid": widget.aid},
+      );
       setState(() {
         book = response.data;
-        reviews = List<Map<String, dynamic>>.from(response.data['reviewList'] ?? []);
+        reviews = List<Map<String, dynamic>>.from(reviewRes.data);
+        isLoading = false;
       });
     } catch (e) {
-      print("불러오기 실패: $e");
+      print("도서 상세 정보 불러오기 실패: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-    fetchData();
-  }
-
-  @override
-  Widget build(BuildContext context) { // fs
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(book?['atitle'] ?? '도서 상세'),
+        title: Text("도서 상세"),
         backgroundColor: Colors.green.shade800,
         actions: [
-          // ✅ 리뷰 작성 버튼
-          IconButton(
-            icon: Icon(Icons.rate_review),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ReviewFormPage(aid: widget.aid),
-                ),
-              ).then((value) {
-                if (value == true) fetchData(); // 등록 성공 시 새로고침
-              });
-            },
-          ),
-
-          // ✅ 도서 수정 버튼 추가
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => BookFormPage(aid: widget.aid),
                 ),
-              ).then((value) {
-                if (value == true) fetchData(); // 수정 후 새로고침
-              });
+              );
+              if (result == true) await fetchDetail();
             },
           ),
           IconButton(
             icon: Icon(Icons.delete),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => BookDeletePage(aid: widget.aid),
                 ),
-              ).then((value) {
-                if (value == true) {
-                  Navigator.pop(context, true); // 목록으로 돌아가기 + 새로고침
-                }
-              });
+              );
+              if (result == true) Navigator.pop(context, true);
             },
           ),
         ],
       ),
-      body: book == null
+      body: isLoading
           ? Center(child: CircularProgressIndicator())
+          : book == null
+          ? Center(child: Text("도서 정보를 불러오지 못했습니다."))
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if ((book!['aimg'] ?? '').isNotEmpty)
+            if ((book!["aimg"] ?? '').isNotEmpty)
               Image.network(
-                "http://192.168.40.5:8080/upload/${book!['aimg']}",
-                height: 200,
+                "http://192.168.40.5:8080/upload/${book!["aimg"]}",
+                height: 180,
               ),
+            SizedBox(height: 16),
+            Text("제목: ${book!["atitle"]}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Text("저자: ${book!["awriter"]}", style: TextStyle(fontSize: 16)),
+            SizedBox(height: 8),
+            Text("소개: ${book!["acontent"]}", style: TextStyle(fontSize: 14)),
+            SizedBox(height: 24),
+            Divider(),
+            Text("리뷰", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             SizedBox(height: 12),
-            Text("제목: ${book!['atitle']}", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            Text("저자: ${book!['awriter']}"),
-            Text("소개: ${book!['acontent']}", maxLines: 5),
-            Divider(height: 32),
-            Text("📌 리뷰 목록", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            if (reviews.isEmpty)
-              Text("등록된 리뷰가 없습니다."),
             ...reviews.map((r) => ReviewCard(
-              rtitle: r['rtitle'] ?? '',
-              rwriter: r['rwriter'] ?? '',
-              rcontent: r['rcontent'] ?? '',
+              rtitle: r['rtitle'],
+              rwriter: r['rwriter'],
+              rcontent: r['rcontent'],
               rimg: r['rimg'] ?? '',
               rno: r['rno'],
               aid: widget.aid,
-              onDeleted: fetchData, // 삭제 후 새로고침
-            ))
+              onDeleted: () => fetchDetail(),
+            )).toList(),
+            SizedBox(height: 60),
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ReviewFormPage(aid: widget.aid),
+            ),
+          );
+          if (result == true) await fetchDetail();
+        },
+        label: Text("리뷰 등록"),
+        icon: Icon(Icons.comment),
+        backgroundColor: Colors.green,
+      ),
     );
-  } // fe
-} // CE
+  }
+}

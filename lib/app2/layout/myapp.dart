@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lelabo_app1/app2/layout/mainapp.dart'; // 하단탭 구조 포함된 메인 앱
-
+import 'package:lelabo_app1/app2/book/book_form.dart';
 class MyApp extends StatelessWidget { // CS
   const MyApp({super.key});
 
@@ -18,6 +18,9 @@ class MyApp extends StatelessWidget { // CS
         scaffoldBackgroundColor: Colors.white,
       ),
       home: MainApp(),  // 하단 탭 포함된 레이아웃으로 시작
+      routes: {
+        '/bookForm': (context) => BookFormPage(), // ✅ 책 등록 페이지 연결
+      },
     );
   } // fe
 } // CE

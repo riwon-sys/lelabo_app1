@@ -1,12 +1,12 @@
-/*  book_list.dart | rw 25-04-18 재구성
-   - 추천 도서 전체 조회 페이지입니다.
-   - Dio로 /ab/abfindall 호출하여 데이터 출력합니다.
-   - 데이터 없을 시 "등록된 책이 없습니다" 메시지 출력.
+/*  book_list.dart | rw 25-04-19 수정
+   - 도서 등록 + 리뷰 등록 버튼 통합
+   - 리뷰 등록 버튼을 첫 화면에서 제거하고, 상세 페이지에 배치 예정
 */
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lelabo_app1/app2/book/book_detail.dart';
+import 'package:lelabo_app1/app2/book/book_form.dart'; // ✅ 도서 등록 페이지
 
 class BookListPage extends StatefulWidget {
   const BookListPage({Key? key}) : super(key: key);
@@ -23,7 +23,12 @@ class _BookListPageState extends State<BookListPage> {
   @override
   void initState() {
     super.initState();
-    fetchBooks();
+    delayedFetch();
+  }
+
+  Future<void> delayedFetch() async {
+    await Future.delayed(Duration(milliseconds: 300));
+    await fetchBooks();
   }
 
   Future<void> fetchBooks() async {
@@ -75,18 +80,16 @@ class _BookListPageState extends State<BookListPage> {
                     if ((book['aimg'] ?? '').isNotEmpty)
                       Image.network(
                         "http://192.168.40.5:8080/upload/${book['aimg']}",
-                        // ✅ 로컬호스트 수정
                         height: 160,
                       ),
                     SizedBox(height: 8),
-                    Text("제목: ${book['atitle']}", style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text(
-                        "저자: ${book['awriter']}", style: TextStyle(color: Colors
-                        .grey[600])),
+                    Text("제목: ${book['atitle']}",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text("저자: ${book['awriter']}",
+                        style: TextStyle(color: Colors.grey[600])),
                     SizedBox(height: 4),
-                    Text("소개: ${book['acontent']}", maxLines: 2,
-                        overflow: TextOverflow.ellipsis),
+                    Text("소개: ${book['acontent']}",
+                        maxLines: 2, overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
@@ -95,11 +98,16 @@ class _BookListPageState extends State<BookListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/bookForm') // 📌 라우트 방식 사용 시
-              .then((value) {
-            if (value == true) fetchBooks(); // ✅ 등록/삭제 후 목록 새로고침
-          });
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BookFormPage()),
+          );
+
+          if (result == true) {
+            await fetchBooks();
+            setState(() {});
+          }
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.green,
@@ -108,4 +116,3 @@ class _BookListPageState extends State<BookListPage> {
     );
   }
 }
-
