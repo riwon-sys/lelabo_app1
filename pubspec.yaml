@@ -1,27 +1,28 @@
 name: lelabo_app1
 description: A new Flutter project.
-publish_to: 'none'
+publish_to: 'none' # 이 프로젝트는 pub.dev에 공개하지 않음
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: ^3.7.2 # Dart SDK 최소 버전 설정 (3.7.2 이상 필수)
 
 dependencies:
   flutter:
-    sdk: flutter
-  dio: ^5.8.0+1               # HTTP 통신용
-  image_picker: ^1.0.4       # 이미지 선택 기능
-  cupertino_icons: ^1.0.8    # iOS용 아이콘
+    sdk: flutter # 기본 Flutter 프레임워크
+  dio: ^5.8.0+1               # 서버와 HTTP 통신할 때 사용 (예: 로그인 요청)
+  image_picker: ^1.0.4       # 갤러리/카메라에서 이미지 선택 (예: 프로필 사진 업로드)
+  cupertino_icons: ^1.0.8    # iOS 스타일 아이콘 사용 (예: 뒤로가기 아이콘 등)
+  shared_preferences: ^2.5.3 # 간단한 로컬 저장소 (예: 자동 로그인 상태 저장)
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
+    sdk: flutter # 테스트 코드 작성 시 사용 (단위 테스트, 위젯 테스트)
+  flutter_lints: ^5.0.0       # 코드 스타일 검사 및 일관성 유지
 
 flutter:
-  uses-material-design: true
+  uses-material-design: true # 머티리얼 디자인 UI 사용 설정 (기본 위젯 스타일 포함)
 
   assets:
-    - assets/
-    - assets/images/
+    - assets/                # 전체 에셋 폴더 포함 (예: JSON 파일 등)
+    - assets/images/         # 이미지 파일 폴더 포함 (예: 로고, 배경 등)
