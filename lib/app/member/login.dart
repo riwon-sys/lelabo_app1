@@ -9,6 +9,8 @@
 import 'package:dio/dio.dart';                           // Dio: HTTP 요청 처리 패키지
 import 'package:flutter/material.dart';                  // 기본 위젯 포함된 Flutter 패키지
 import 'package:shared_preferences/shared_preferences.dart'; // 로컬 저장소 패키지 (토큰 저장용)
+import 'package:lelabo_app1/app/layout/mainapp.dart';
+import 'package:lelabo_app1/app/member/signup.dart';
 
 // [2] 상태를 가지는 Stateful 위젯 정의
 class Login extends StatefulWidget { // CS
@@ -38,7 +40,7 @@ class _LoginState extends State<Login> { // CS
 
       // (3) Spring 서버로 POST 요청 전송
       final response = await dio.post(
-        "http://localhost:8080/member/login", // 로그인 API 주소
+        "http://192.168.40.5/member/login", // 로그인 API 주소
         data: sendData,
       );
 
@@ -50,7 +52,12 @@ class _LoginState extends State<Login> { // CS
         final prefs = await SharedPreferences.getInstance();
         // (7) 응답받은 토큰 값을 전역 저장소에 저장
         await prefs.setString('token', data);
-      } else {
+
+        // [*] 로그인 성공시 페이지 전환
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainApp()),
+        );
+
+      }else {
         print("로그인 실패");
       }
 
@@ -63,12 +70,12 @@ class _LoginState extends State<Login> { // CS
   @override
   Widget build(BuildContext context) { // fs
     return Scaffold( // 전체 화면 기본 구조 제공
-      body: Container(
+      body: Container( // 여백 제공하는 박스 위젯
         padding: EdgeInsets.all(30), // 내부 여백
         margin: EdgeInsets.all(30),  // 외부 여백
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // 세로 중앙 정렬
-          children: [
+        child: Column( // 하위 요소들  세로축 위젯
+          mainAxisAlignment: MainAxisAlignment.center, // 세로 중앙 정렬(현재 축인(Column) 기준으로 정렬
+          children: [ // 하위 요소들 위젯
 
             // (1) 이메일 입력 필드
             TextField(
@@ -103,13 +110,15 @@ class _LoginState extends State<Login> { // CS
 
             // (4) 회원가입으로 이동 안내
             TextButton(
-              onPressed: () => {}, // 현재는 미구현
-              child: Text("처음 방문이면 _회원가입"),
-            ),
+              onPressed: () => {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context)=>Signup())
+                )
+              }, child: Text("처음 방문이면 _회원가입")
+            )
           ],
         ),
       ),
     );
   } // fe
-
 } // CE

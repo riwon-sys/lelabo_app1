@@ -1,28 +1,29 @@
-name: lelabo_app1
-description: A new Flutter project.
-publish_to: 'none' # 이 프로젝트는 pub.dev에 공개하지 않음
+name: lelabo_app1                       # 프로젝트 이름 (앱의 고유 식별자)
+description: A new Flutter project.    # 프로젝트 설명
+publish_to: 'none'                     # pub.dev에 배포하지 않도록 설정
 
-version: 1.0.0+1
+version: 1.0.0+1                       # 버전 관리 (앱 버전 + 빌드 넘버)
 
 environment:
-  sdk: ^3.7.2 # Dart SDK 최소 버전 설정 (3.7.2 이상 필수)
+  sdk: ^3.7.2                          # 최소 Dart SDK 버전 설정 (3.7.2 이상 필요)
 
-dependencies:
+dependencies:                          # 앱에서 사용하는 외부 패키지 목록
   flutter:
-    sdk: flutter # 기본 Flutter 프레임워크
-  dio: ^5.8.0+1               # 서버와 HTTP 통신할 때 사용 (예: 로그인 요청)
-  image_picker: ^1.0.4       # 갤러리/카메라에서 이미지 선택 (예: 프로필 사진 업로드)
-  cupertino_icons: ^1.0.8    # iOS 스타일 아이콘 사용 (예: 뒤로가기 아이콘 등)
-  shared_preferences: ^2.5.3 # 간단한 로컬 저장소 (예: 자동 로그인 상태 저장)
+    sdk: flutter                      # Flutter 프레임워크 자체 사용
+  dio: ^5.8.0+1                       # HTTP 요청용 라이브러리 (예: 로그인, 데이터 전송 등)
+  image_picker: ^1.1.2                # 이미지 선택 (카메라/갤러리에서 불러오기)
+  cupertino_icons: ^1.0.8             # iOS 스타일 아이콘 사용 (뒤로가기 등)
+  shared_preferences: ^2.5.3          # 간단한 로컬 저장소 기능 (예: 자동 로그인 상태 저장 등)
+  fluttertoast: ^8.2.12               # 간단한 알림 메시지 표시용 토스트 팝업
 
-dev_dependencies:
+dev_dependencies:                     # 개발 전용 패키지 목록 (배포 시 포함되지 않음)
   flutter_test:
-    sdk: flutter # 테스트 코드 작성 시 사용 (단위 테스트, 위젯 테스트)
-  flutter_lints: ^5.0.0       # 코드 스타일 검사 및 일관성 유지
+    sdk: flutter                      # 테스트 작성용 도구 (단위/위젯 테스트 등)
+  flutter_lints: ^5.0.0               # 코드 스타일 검사 도구 (일관성 유지 및 문법 체크용)
 
 flutter:
-  uses-material-design: true # 머티리얼 디자인 UI 사용 설정 (기본 위젯 스타일 포함)
+  uses-material-design: true          # 머티리얼 디자인 UI 사용 (Google UI 스타일 적용)
 
-  assets:
-    - assets/                # 전체 에셋 폴더 포함 (예: JSON 파일 등)
-    - assets/images/         # 이미지 파일 폴더 포함 (예: 로고, 배경 등)
+  assets:                             # 앱에 포함시킬 리소스 파일 경로
+    - assets/                         # 전체 assets 폴더 포함 (예: JSON, 설정 파일 등)
+    - assets/images/                  # 이미지 전용 폴더 포함 (예: 로고, 배경 이미지 등
